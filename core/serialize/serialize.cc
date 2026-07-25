@@ -1233,7 +1233,7 @@ vector<uint8_t> Serializer::storeTree(const core::File &file, const ast::ParsedF
 
     // See comment in `serialize.h` above `loadTree`.
     p.putU4(file.source().size());
-    p.putBytes(file.sourceHash());
+    p.putU8(file.sourceHash());
 
     SerializerImpl::pickle(p, file.getFileHash());
     SerializerImpl::pickle(p, file, tree.tree);
@@ -1251,7 +1251,7 @@ ast::ExpressionPtr Serializer::loadTree(const core::GlobalState &gs, core::File 
     }
 
     auto expectedHash = file.sourceHash();
-    auto hashBytes = p.getBytes();
+    auto hashBytes = p.getU8();
     if (hashBytes != expectedHash) {
         return nullptr;
     }

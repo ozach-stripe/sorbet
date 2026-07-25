@@ -95,7 +95,7 @@ public:
     static std::string censorFilePathForSnapshotTests(std::string_view orig);
 
     // Returns the hash of the file content. Requires that the file has been read.
-    std::array<uint8_t, 64> sourceHash() const;
+    uint64_t sourceHash() const;
 
 private:
     struct Flags {

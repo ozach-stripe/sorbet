@@ -1,13 +1,15 @@
+// Must go before xxhash include. Makes a noticeable performance improvement (~10%).
+#define XXH_INLINE_ALL
+
 #include "core/Files.h"
+#include "absl/strings/match.h"
 #include "common/FileOps.h"
-#include "common/crypto_hashing/crypto_hashing.h"
 #include "core/Context.h"
 #include "core/FileHash.h"
 #include "core/GlobalState.h"
 #include "core/SigilTraits.h"
+#include "xxhash.h"
 #include <vector>
-
-#include "absl/strings/match.h"
 
 template class std::vector<std::shared_ptr<sorbet::core::File>>;
 template class std::shared_ptr<sorbet::core::File>;
@@ -315,9 +317,13 @@ void File::setHasIndexErrors(bool value) {
     flags.hasIndexErrors = value;
 }
 
-std::array<uint8_t, 64> File::sourceHash() const {
+uint64_t File::sourceHash() const {
     ENFORCE(this->sourceType != File::Type::NotYetRead);
-    return crypto_hashing::hash64(this->source_);
+
+    // We don't set the seed to anything special, as it's not clear what additional data from the file we would want to
+    // use. You could imagine using the length, but xxHash already uses that when seeding its internal state.
+    uint64_t seed = 0;
+    return XXH64(this->source_.data(), this->source_.size(), seed);
 }
 
 } // namespace sorbet::core

@@ -320,10 +320,16 @@ void File::setHasIndexErrors(bool value) {
 uint64_t File::sourceHash() const {
     ENFORCE(this->sourceType != File::Type::NotYetRead);
 
+    if (this->sourceHash_ != 0) {
+        return this->sourceHash_;
+    }
+
     // We don't set the seed to anything special, as it's not clear what additional data from the file we would want to
     // use. You could imagine using the length, but xxHash already uses that when seeding its internal state.
     uint64_t seed = 0;
-    return XXH64(this->source_.data(), this->source_.size(), seed);
+    this->sourceHash_ = XXH64(this->source_.data(), this->source_.size(), seed);
+
+    return this->sourceHash_;
 }
 
 } // namespace sorbet::core

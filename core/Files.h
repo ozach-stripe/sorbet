@@ -128,6 +128,8 @@ private:
     // for that file, and computing lazily allows saving space.
     mutable std::shared_ptr<std::vector<uint32_t>> lineBreaks_;
 
+    mutable uint64_t sourceHash_ = 0;
+
     mutable StrictLevel minErrorLevel_ = StrictLevel::Max;
 
 public:
@@ -138,7 +140,7 @@ private:
     std::shared_ptr<const FileHash> hash_;
 };
 
-CheckSize(File, 96, 8);
+CheckSize(File, 104, 8);
 
 template <typename H> H AbslHashValue(H h, const FileRef &m) {
     return H::combine(std::move(h), m.id());
